@@ -22,8 +22,9 @@ app = FastAPI(lifespan=lifespan)
 # The next endpoint is used for sending the list of tensorflow models. The client will ask for a list of available models. Available models are in folder "models".
 @app.get("/list-models/")                           # Endpoint to list available models
 async def list_models():
+    # List all files and folders in the "models" directory, except gitignore file
 
-    models = [f for f in os.listdir("models")]
+    models = [f for f in os.listdir("models") if f != ".gitignore"]
     return {"models": models}
 
 
