@@ -3,17 +3,18 @@ from contextlib import asynccontextmanager
 import pandas as pd
 import io
 import os
-from codigos import preprocesa
 import joblib
 import tensorflow as tf
 from tensorflow import keras
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+from importlib import import_module
 
 @asynccontextmanager                # Lifespan manager to handle startup and shutdown events. Global variables for model, encoder and scaler.
 async def lifespan(app: FastAPI):
     app.state.model = None
     app.state.label_encoder = None
     app.state.scaler = None
+    app.state.model_folder = None
     yield
 
 app = FastAPI(lifespan=lifespan)
@@ -46,7 +47,7 @@ async def select_model(model_name: str = Form(...)):
     except IndexError:
         return {"message": "Model files not found in the specified folder"}
 
-
+    app.state.model_folder = model_folder
     app.state.model = tf.keras.models.load_model(model_path)
     app.state.label_encoder = joblib.load(encoder_path)
     app.state.scaler = joblib.load(scaler_path)
@@ -63,7 +64,18 @@ async def upload_csv(file: UploadFile = File(...)):
 
     df_experiment = pd.read_csv(io.StringIO((await file.read()).decode('utf-8')))
 
-    X=preprocesa(df_experiment)
+    # Now we will preprocess the data using the fuction Preprocesa from the python file we can find in the model folder. The name of the file Preprocesa_(folder_name).py. The name of the function is Preprocesa_(folder_name).
+
+
+    module_name = f"models.{os.path.basename(app.state.model_folder)}.Preprocesa_{os.path.basename(app.state.model_folder)}"
+    try:
+        module = import_module(module_name)  # Import the module dynamically
+        preprocesa_function = getattr(module, f"Preprocesa_{os.path.basename(app.state.model_folder)}")  # Get the function dynamically
+    except (ModuleNotFoundError, AttributeError) as e:
+        return {"message": f"Preprocessing function not found: {e}"}
+
+    X = preprocesa_function(df_experiment)  # Call the function with df_ex
+
 
     # if X is empty or none, return a message
     if X is None or X.empty:
