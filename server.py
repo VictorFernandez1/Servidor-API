@@ -38,7 +38,7 @@ async def select_model(model_name: str = Form(...)):
 
     # Load the tensorflow model. The model is a keras file that is inside a folder with the name of the model. The name of the model starts with Classifier.
 
-    model_folder = os.path.join("models", model_name)
+    model_folder = os.path.join("Tf_Models", model_name)
     #Now we will load the model, the encotder and the scaler.
     try:
         model_path = os.path.join(model_folder, [f for f in os.listdir(model_folder) if f.startswith("Classifier")][0])
