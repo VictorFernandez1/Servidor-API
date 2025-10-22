@@ -25,7 +25,7 @@ app = FastAPI(lifespan=lifespan)
 async def list_models():
     # List all files and folders in the "models" directory, except gitignore file
 
-    models = [f for f in os.listdir("models") if f != ".gitignore"]
+    models = [f for f in os.listdir("Tf_Models") if f != ".gitignore"]
     return {"models": models}
 
 
@@ -33,7 +33,7 @@ async def list_models():
 @app.post("/select-model/")                           # Endpoint to select a model
 async def select_model(model_name: str = Form(...)):
     # Check if the model exists
-    if not os.path.exists(os.path.join("models", model_name)):
+    if not os.path.exists(os.path.join("Tf_Models", model_name)):
         return {"message": "Model not found"}
 
     # Load the tensorflow model. The model is a keras file that is inside a folder with the name of the model. The name of the model starts with Classifier.
@@ -67,7 +67,7 @@ async def upload_csv(file: UploadFile = File(...)):
     # Now we will preprocess the data using the fuction Preprocesa from the python file we can find in the model folder. The name of the file Preprocesa_(folder_name).py. The name of the function is Preprocesa_(folder_name).
 
 
-    module_name = f"models.{os.path.basename(app.state.model_folder)}.Preprocesa_{os.path.basename(app.state.model_folder)}"
+    module_name = f"Tf_Models.{os.path.basename(app.state.model_folder)}.Preprocesa_{os.path.basename(app.state.model_folder)}"
     try:
         module = import_module(module_name)  # Import the module dynamically
         preprocesa_function = getattr(module, f"Preprocesa_{os.path.basename(app.state.model_folder)}")  # Get the function dynamically
