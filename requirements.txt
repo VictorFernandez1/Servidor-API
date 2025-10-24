@@ -1,7 +1,9 @@
-fastapi
+# Requirements for the FastAPI server. Includes specific versions for reproducibility.
+
+fastapi==0.118.0
 uvicorn
-pandas
-joblib
-tensorflow
-scikit-learn
+pandas==2.3.3
+joblib==1.4.2
+tensorflow==2.20.0
+scikit-learn==1.6.1
 python-multipart
