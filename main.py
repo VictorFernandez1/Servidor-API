@@ -91,5 +91,14 @@ async def upload_csv(file: UploadFile = File(...)):
     return {"predictions": predictions.tolist(), "predicted_labels": predicted_labels.tolist()}
 
 
+@app.get("/ping")                         # Lightweight endpoint for uptime checks
+async def ping():
+    """
+    Lightweight endpoint for uptime checks.
+    Returns 200 OK quickly to keep the server awake.
+    """
+    return {"status": "ok", "message": "Server is alive"}
+
+
 
 
